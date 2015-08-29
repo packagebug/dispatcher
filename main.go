@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	_ "github.com/lib/pq"
-	"github.com/robfig/cron"
 )
 
 const (
@@ -131,15 +130,9 @@ func main() {
 	config.Region = &PACKAGEBUG_SQS_REGION
 
 	sqsconn = sqs.New(config)
-	// dispatch a jobs once a day
-	c := cron.New()
-	c.AddFunc("@daily", dispatchJobs)
-	c.Start()
-
-	// forever wait, it prevents program to close and the cron can running
-	// periodically
-	var wg sync.WaitGroup
-	wg.Add(1)
-	log.Println("[dispatcher] service started ...")
-	wg.Wait()
+	// dispatch jobs once a day
+	for {
+		<-time.After(24 * time.Hour)
+		go dispatchJobs()
+	}
 }
