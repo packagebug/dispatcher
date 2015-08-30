@@ -3,7 +3,8 @@ CREATE TABLE packages (
     package_path text UNIQUE NOT NULL,
     package_host text NOT NULL,
     package_owner text NOT NULL,
-    package_repo text NOT NULL
+    package_repo text NOT NULL,
+    package_etag text
 );
 
 CREATE TABLE bugs (
