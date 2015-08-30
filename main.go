@@ -71,7 +71,7 @@ func sendMessages(packages []Package) error {
 	return nil
 }
 
-// dispatchJobs dispatchs a jobs everyday.
+// dispatchJobs dispatchs a jobs via Amazon SQS.
 func dispatchJobs() {
 	// get data of all packages from the database
 	rows, err := dbconn.Query(`
@@ -93,6 +93,10 @@ func dispatchJobs() {
 			return
 		}
 		packages = append(packages, p)
+	}
+	if err := rows.Err(); err != nil {
+		log.Printf("[dispatcher] iterate rows: %v\n", err)
+		return
 	}
 
 	// send message to Amazon SQS as a batch
